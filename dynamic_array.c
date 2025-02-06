@@ -8,6 +8,7 @@ typedef struct
 {
     int size;
     int *array;
+    int capacity;
 } dynamic_int_array;
 
 // Створює новий масив
@@ -18,7 +19,9 @@ dynamic_int_array *new_dynamic_array()
         return NULL;
 
     i->size = 0;
-    i->array = malloc(sizeof(int) * INITIAL_CAPACITY);
+    i->capacity = INITIAL_CAPACITY;
+    i->array = malloc(sizeof(int) * i->capacity);
+
     if (i->array == NULL)
     {
         free(i);
@@ -30,7 +33,7 @@ dynamic_int_array *new_dynamic_array()
 // Додає число в кінець масиву
 int append(dynamic_int_array *arr, int value)
 {
-    if (arr->size == INITIAL_CAPACITY)
+    if (arr->size >= arr->capacity)
     {
         int capacity = arr->size * 2;
         int *copy_array;
@@ -41,23 +44,30 @@ int append(dynamic_int_array *arr, int value)
         if (copy_array == NULL)
             return 0;
         arr->array = copy_array;
+        arr->capacity = capacity;
     }
     arr->array[arr->size] = value;
     arr->size++;
+    
     return arr->size;
 }
 
-/**
-// Повертає елемент за індексом
-int get(const dynamic_int_array *arr, size_t index)
-{
-}
 
 // Видаляє елемент та зсуває решту вліво
-int delete(dynamic_int_array *arr, size_t index)
+// [1, 2, 3, 4, 5] => delete(3) => [1, 2, 3, 5]
+int delete(dynamic_int_array *arr, int index)
 {
+//    arr->array[0] = arr->array[1]
+//    arr->array[1] = arr->array[2]
+
+    for (int i = index; i < arr->size; i++) {
+        arr->array[i] = arr->array[i+1];
+        // *(arr->array+i) = *(arr->array+(i+1))    
+        // printf("%d", *(arr->array+i));
+    }
+    arr->size--;
+    return arr->size;
 }
-*/
 
 void free_array(dynamic_int_array *arr)
 {
@@ -83,10 +93,14 @@ int main(void)
 {
     dynamic_int_array *arr = new_dynamic_array();
     
-    for (int i = 0; i < 10000000; i++) {
+    for (int i = 0; i < 5; i++) {
         append(arr, i);
     }
-    
-    //print_array(arr);
+    print_array(arr);
+    delete(arr, 3);
+    delete(arr, 3);
+    print_array(arr);
     free_array(arr);
+
+
 }
