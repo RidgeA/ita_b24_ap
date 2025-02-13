@@ -44,12 +44,11 @@ linked_list *create_list()
  * Параметри:
  * list: вказівник на список
  * value: значення для додавання
- * position: позиція для вставки (0-based)
+ * index: позиція для вставки (0-based)
  *
  * Особливості:
- * - Якщо position = 0, додає на початок
- * - Якщо position >= розмір списку, додає в кінець
- * - Якщо position < 0, повертає помилку
+ * - Якщо index <= 0, додає на початок
+ * - Якщо index >= розмір списку, додає в кінець
  *
  * Приклад:
  * // list: null
@@ -60,7 +59,7 @@ linked_list *create_list()
  * insert(list, 5, 0);     // 5 -> 10 -> 25 -> 20 -> 30
  * insert(list, 40, 999);  // додасть в кінець: 5 -> 10 -> 25 -> 20 -> 30 -> 40
  */
-void insert(linked_list *list, int value, int position)
+void insert(linked_list *list, int value, int index)
 {
 
     node *n = malloc(sizeof(node));
@@ -70,12 +69,22 @@ void insert(linked_list *list, int value, int position)
     }
     n->num = value;
 
-    if (position <= 0)
+    if (list->head == NULL || index <= 0)
     {
-        node *priviously_head = list->head;
+        n->next = list->head;
         list->head = n;
-        n->next = priviously_head;
+        return;
     }
+
+    int i = 0;
+    node *current = list->head;
+    while (current->next != NULL && i < index - 1)
+    {
+        current = current->next;
+        i++;
+    }
+    n->next = current->next;
+    current->next = n;
 }
 
 /*
@@ -83,19 +92,42 @@ void insert(linked_list *list, int value, int position)
  *
  * Параметри:
  * list: вказівник на список
- * position: позиція елемента для видалення (0-based)
- *
- * Особливості:
- * - Якщо список порожній, виводить повідомлення про помилку
- * - Якщо position < 0 або position >= розмір списку, повертає помилку
+ * index: позиція елемента для видалення (0-based)
  *
  * Приклад:
  * // list: 10 -> 20 -> 30 -> 40
  * delete(list, 1);  // 10 -> 30 -> 40
  * delete(list, 0);  // 30 -> 40
  */
-void delete(linked_list *list, int position)
+void delete(linked_list *list, int index)
 {
+    if(list->head == NULL){
+        return;
+    }
+
+    if(index == 0){
+        node *previous_head = list->head;
+        list->head = list->head->next;
+        free(previous_head);
+        return;
+    }
+
+    int i=0;
+    node *current = list->head;
+    while (current!=NULL && i<index-1)
+    {
+        current=current->next;
+        i++;
+    }
+
+    node *deleted_node = current->next;
+    if(deleted_node !=NULL){
+        current->next=deleted_node->next;
+        free(deleted_node);
+        return;
+    }
+    current->next=NULL;
+    
 }
 
 /*
@@ -104,13 +136,13 @@ void delete(linked_list *list, int position)
  * Параметри:
  * list: вказівник на список
  * value: значення для пошуку
- * position: вказівник на змінну, куди буде записана позиція знайденого елемента
+ * index: вказівник на змінну, куди буде записана позиція знайденого елемента
  *
  * Повертає:
  * - true: якщо елемент знайдено
  * - false: якщо елемент не знайдено
  */
-bool search(linked_list *list, int value, int *position)
+bool search(linked_list *list, int value, int *index)
 {
 }
 
@@ -179,6 +211,11 @@ int main()
     insert(list, 2, 0);
     insert(list, 3, 0);
     insert(list, 4, 0);
+    insert(list, 5, 2);
+    insert(list, 6, 999);
+    delete(list, 6);
+    delete(list, 1);
+    delete(list, 0);
     print_list(list);
     free_list(list);
     /**
@@ -192,9 +229,9 @@ int main()
         print_list(list);
 
         // Пошук елементів
-        int position;
-        if (search(list, 30, &position)) {
-            printf("Елемент 30 знайдено на позиції: %d\n", position);
+        int index;
+        if (search(list, 30, &index)) {
+            printf("Елемент 30 знайдено на позиції: %d\n", index);
         }
 
         // Видалення елементів
