@@ -218,35 +218,5 @@ int main()
     delete(list, 0);
     print_list(list);
     free_list(list);
-    /**
-        // Додавання елементів
-        insert(list, 10, 0);  // 10
-        insert(list, 20, 1);  // 10 -> 20
-        insert(list, 30, 1);  // 10 -> 30 -> 20
-        insert(list, 40, 3);  // 10 -> 30 -> 20 -> 40
-
-        printf("Після додавання елементів:\n");
-        print_list(list);
-
-        // Пошук елементів
-        int index;
-        if (search(list, 30, &index)) {
-            printf("Елемент 30 знайдено на позиції: %d\n", index);
-        }
-
-        // Видалення елементів
-        printf("\nВидалення елемента з позиції 1:\n");
-        delete(list, 1);
-        print_list(list);
-
-        printf("\nВидалення елемента з початку (позиція 0):\n");
-        delete(list, 0);
-        print_list(list);
-
-        printf("\nРозмір списку: %d\n", get_size(list));
-
-        free_list(list);
-
-    */
     return 0;
 }
