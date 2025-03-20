@@ -143,8 +143,7 @@ void add_edge_to_graph(graph *graph_ptr, vertex *source, vertex *target)
 // Function to print vertex information
 void print_vertex(vertex *vertex_ptr)
 {
-    printf("Vertex with data %d has %d edges\n",
-           vertex_ptr->data, vertex_ptr->edge_count);
+    printf("Vertex with data %d has %d edges\n", vertex_ptr->data, vertex_ptr->edge_count);
 
     for (int i = 0; i < vertex_ptr->edge_count; i++)
     {
@@ -201,17 +200,22 @@ void free_graph(graph *graph_ptr)
     free(graph_ptr);
 }
 
-// DFS (Depth-First Search) traversal
-void dfs(graph *graph_ptr, vertex *start_vertex)
+vertex **connected_vertexes(vertex *current_vertex)
 {
-    // create 'visited'
-    // dfs_rec(graph_ptr, current_vertex, visited)
-}
-
-void dfs_rec(graph *graph_ptr, vertex *current_vertex, vertex** visited) {
-
-    // visit - print
-    // for each neighbour vertex dfs_rec(graph_ptr, neighbour_vertex, visited)
+    vertex **result = malloc(sizeof(vertex) * current_vertex->edge_count);
+    for (int i = 0; i < current_vertex->edge_count; i++)
+    {
+        edge *current_edge = current_vertex->edges[i];
+        if (current_edge->target != current_vertex)
+        {
+            result[i] = current_edge->target;
+        }
+        else
+        {
+            result[i] = current_edge->source;
+        }
+    }
+    return result;
 }
 
 bool contain(vertex **array, int size, vertex *target)
@@ -225,6 +229,35 @@ bool contain(vertex **array, int size, vertex *target)
     }
     return false;
 }
+
+void dfs_rec(graph *graph_ptr, vertex *current_vertex, vertex **visited, int *last_visited)
+{
+    printf("%d\n", current_vertex->data);
+    visited[*last_visited] = current_vertex;
+    (*last_visited)++;
+    vertex **neighbours = connected_vertexes(current_vertex);
+    for (int i = 0;i<current_vertex->edge_count; i++)
+    {
+        if (!contain(visited, graph_ptr->vertex_count, neighbours[i]))
+        {
+            dfs_rec(graph_ptr, neighbours[i], visited, last_visited);
+        }
+    }
+    free(neighbours);
+    // visit - print
+    // for each neighbour vertex dfs_rec(graph_ptr, neighbour_vertex, visited)
+}
+
+// DFS (Depth-First Search) traversal
+void dfs(graph *graph_ptr, vertex *start_vertex)
+{
+    vertex **visited = malloc(sizeof(vertex) * graph_ptr->vertex_count);
+    int last_visited = 0;
+    dfs_rec(graph_ptr, start_vertex, visited, &last_visited);
+    free(visited);
+}
+
+
 // BFS (Breadth-First Search) traversal
 void bfs(graph *graph_ptr, vertex *start_vertex)
 {
@@ -237,7 +270,7 @@ void bfs(graph *graph_ptr, vertex *start_vertex)
     {
         vertex *current_vertex = queue[head_of_queue];
         printf("%d\n", current_vertex->data);
-        
+
         for (int i = 0; i < current_vertex->edge_count; i++)
         {
             if (!contain(queue, graph_ptr->vertex_count, current_vertex->edges[i]->target))
@@ -252,11 +285,10 @@ void bfs(graph *graph_ptr, vertex *start_vertex)
             }
         }
         head_of_queue++;
-        if (head_of_queue == 10) return;
+        if (head_of_queue == 10)
+            return;
     }
-
 }
-
 
 // Example usage
 int main()
@@ -358,8 +390,9 @@ int main()
 
     // Perform graph traversals
     printf("\nGraph traversals:\n");
-    printf("----------------\n");
-    // dfs(my_graph, v1);
+    printf("DFS ----------------\n");
+    dfs(my_graph, v1);
+    printf("BFS ----------------\n");
     bfs(my_graph, v1);
 
     // dfs(my_graph, v2);
